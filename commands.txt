@@ -1,0 +1,5 @@
+npm init -y
+npm install mongodb
+npm install body-parser
+npm install express
+npm install @google/maps

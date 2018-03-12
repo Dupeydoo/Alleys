@@ -1,0 +1,26 @@
+{
+  "name": "Alleys",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Dupeydoo/Alleys.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Dupeydoo/Alleys/issues"
+  },
+  "homepage": "https://github.com/Dupeydoo/Alleys#readme",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "mongodb": "^3.0.4",
+    "npm": "^5.7.1"
+  }
+}
