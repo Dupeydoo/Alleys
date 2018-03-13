@@ -1,5 +1,5 @@
-var mongo = require( "mongodb" )
-var mongoClient = mongo.MongoClient
+const mongo = require( "mongodb" )
+const mongoClient = mongo.MongoClient
 
 // app read
 function alleysRead(key, response) {

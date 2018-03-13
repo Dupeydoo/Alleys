@@ -1,10 +1,9 @@
-var mongoCalls = require("./mongocalls")
-var express = require( "express" )
-var bodyParser = require( "body-parser" )
+const mongoCalls = require("./mongocalls")
+const express = require( "express" )
+const bodyParser = require( "body-parser" )
 var app = express()
 app.use( bodyParser.json() )
 
-// GM API key: AIzaSyDjMt3pvIJis3Wa5y7VJSVyOmO7_UgRDVI
 
 
 app.post( "/AlleysRoster/", function ( request, response ) {

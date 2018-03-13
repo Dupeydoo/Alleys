@@ -1,12 +1,27 @@
-var express = require( "express" )
+const express = require( "express" )
 var app = express()
 
 
 
-app.get( "/AlleysRoster/:aRoad&:journeyStart&:rosterCount", function ( request, response ) {
+app.get( "/AlleysSurge/:aRoad&:journeyTime&:rosterCount", function ( request, response ) {
 	var aRoad = request.params.aRoad
-	var journeyStart = request.params.journeyStart
+	var journeyTime = request.params.journeyTime
 	var rosterCount = request.params.rosterCount
+	var multiplier = 1
+
+	if(aRoad) {
+		multiplier *= 2
+	}
+
+	if(journeyTime /*.getHours()*/ > 22 || journeyTime /*.getHours() */ < 5) {
+		multiplier *= 2
+	}
+
+	if(rosterCount < 5) {
+		multiplier *= 2
+	}
+
+	response.json({"multiplier" : multiplier})
 })
 
 
