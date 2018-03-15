@@ -4,7 +4,7 @@ const bodyParser = require("body-parser")
 
 
 var app = express()
-app.use( bodyParser.json() )
+app.use(bodyParser.json())
 
 
 
@@ -25,7 +25,8 @@ function getMappingInformation(start, end, response) {
 
 		function(error, mapResponse, body) {
 			if(error) {
-				response.status(500).send("A team of highly trained monkeys has been dispatched to deal with the situation.")
+				response.status(500).send("A team of highly trained monkeys " 
+					+ "has been dispatched to deal with the situation.")
 			}
 
 			else {

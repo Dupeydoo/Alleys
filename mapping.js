@@ -1,53 +1,31 @@
-const https = require("https")
-const querystring = require('querystring');
-
+const request = require("request")
 const express = require( "express" )
 var app = express()
 
 const mapsApiKey = "AIzaSyAMmf0RuNmg3VO3GVFGL1SJaKz4m2QAuVI"
 
 
+app.get("/AlleysMapping/:start/:end", function(mapRequest, response) {
+	var start = mapRequest.params.start
+	var end = mapRequest.params.end
 
-app.get("/AlleysMapping/:start/:end", function(request, response) {
-	var start = request.params.start
-	var end = request.params.end
+	request("https://maps.googleapis.com/maps/api/directions/json?origin=" + start.toString() 
+		+ "&destination=" + end.toString() + "&region=uk&key=" + mapsApiKey,
 
-	var request = https.request({
-		protocol: "https:",
-		host: "maps.googleapis.com",
-		path: "/maps/api/directions/json?" + querystring.stringify({
-			origin: start,
-			destination: end,
-			region: "uk",
-			key: mapsApiKey
-		}),
-		method: "POST"
-	}, 
+		function(error, apiResponse, body) {
+			if(error) {
+				response.status(500).send("A team of highly trained monkeys " 
+					+ "has been dispatched to deal with the situation.")
+			}
 
-	function(apiResponse) {
-		console.log(apiResponse.statusCode)
-		var responseBody = ""
-		apiResponse.on("data", function(resultData) {
-			responseBody += resultData
+			else {
+				var directions = JSON.parse(body)
+				var aRoadDistance = calculateARoadDistance(directions.routes[0].legs[0].steps)
+				response.json(
+					{totalDistance: directions.routes[0].legs[0].distance.value, aDistance: aRoadDistance}
+				)
+			}
 		})
-
-		apiResponse.on("end", function() {
-			var directions = JSON.parse(responseBody)
-			//directions contains the legs of the journey
-			// each leg contains DirectionStep objects.
-			var aRoadDistance = calculateARoadDistance(directions.routes[0].legs[0].steps);
-			response.json(
-				{totalDistance: directions.routes[0].legs[0].distance.value, aDistance: aRoadDistance}
-			)
-		})
-	})
-
-	request.on("error", function() {
-		response.send("500: Internal Server Error: A team of highly trained monkeys " 
-			+ "has been dispatched to deal with the situation.")
-	})
-	
-	request.end()
 })
 
 
