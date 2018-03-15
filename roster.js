@@ -1,23 +1,23 @@
-const mongo = require( "mongodb" )
+const mongo = require("mongodb")
 const mongoClient = mongo.MongoClient
-const express = require( "express" )
-const bodyParser = require( "body-parser" )
+const express = require("express")
+const bodyParser = require("body-parser")
 
 var app = express()
-app.use( bodyParser.json() )
+app.use(bodyParser.json())
 
 
 
-app.post( "/AlleysRoster/", function ( request, response ) {
+app.post( "/AlleysRoster/", function (request, response) {
 	var keyValue = { key : request.body.key, value : request.body.value }
-	mongoClient.connect( "mongodb://localhost/AlleysDB",
-	function( error, db ) {
+	mongoClient.connect("mongodb://localhost/AlleysDB",
+	function(error, db) {
 		handleDatabaseError(error)
 		var collection = getDatabaseCollection(db)
 		collection.save( keyValue,
-		function( error, result ) {
-			if ( error ) throw error
-			response.json( keyValue )
+		function(error, result) {
+			if (error) throw error
+			response.json(keyValue)
 			db.close()
 		})
 	})
@@ -25,16 +25,16 @@ app.post( "/AlleysRoster/", function ( request, response ) {
 
 
 
-app.get( "/AlleysRoster/:key", function ( request, response ) {
+app.get( "/AlleysRoster/:key", function (request, response) {
 	var key = request.params.key
-	mongoClient.connect( "mongodb://localhost/AlleysDB",
-	function( error, db ) {
+	mongoClient.connect("mongodb://localhost/AlleysDB",
+	function(error, db) {
 	handleDatabaseError(error)
 	var collection = getDatabaseCollection(db)
 	collection.findOne( { key : key },
-		function( error, result ) {
-			if ( error ) throw error
-			response.json( result.value )
+		function(error, result) {
+			if (error) throw error
+			response.json(result.value)
 			db.close()
 		})
 	})
@@ -43,21 +43,21 @@ app.get( "/AlleysRoster/:key", function ( request, response ) {
 
 
 app.get("/AlleysRoster/", function (request, response) {
-	mongoClient.connect( "mongodb://localhost/AlleysDB",
-	function( error, db ) {
+	mongoClient.connect("mongodb://localhost/AlleysDB",
+	function(error, db) {
 		handleDatabaseError(error)
 		var collection = getDatabaseCollection(db)
 		var keys = []
 
 		collection.find().toArray(
-		function( error, result ) {
-			if ( error ) throw error
+		function(error, result) {
+			if (error) throw error
 
 			for (i = 0; i < result.length; i++) {
-				keys.push( result[ i ].key )
+				keys.push( result[i].key )
 			}
 
-			response.json( keys )
+			response.json(keys)
 			db.close()
 		})
 	})
@@ -68,14 +68,14 @@ app.get("/AlleysRoster/", function (request, response) {
 app.put("/AlleysRoster/:key", function (request, response) {
 	var key = request.params.key
 	var keyValue = { key : request.body.key, value : request.body.value }
-	mongoClient.connect( "mongodb://localhost/AlleysDB",
-	function( error, db ) {
+	mongoClient.connect("mongodb://localhost/AlleysDB",
+	function(error, db) {
 		handleDatabaseError(error)
 		var collection = getDatabaseCollection(db)
 		collection.update( { key : key }, keyValue, {upsert : true},
-			function( error, result ) {
-				if ( error ) throw error
-				response.json( keyValue )
+			function(error, result) {
+				if (error) throw error
+				response.json(keyValue)
 				db.close()
 		})
 	})
@@ -116,6 +116,19 @@ function handleDatabaseError(error) {
 
 
 
-app.listen( 3000, function () {
-	console.log( "listening on port 3000..." )
+app.listen(3000, function() {
+	console.log("listening on port 3000...")
+})
+
+
+
+app.use(function(request, response, next) {
+    response.status(404).send("The page could not be found!");
+});
+
+
+
+app.use(function(error, request, response, next) {
+	response.status(500).send("A team of highly trained monkeys" 
+		+ "has been dispatched to deal with the situation.")
 })
