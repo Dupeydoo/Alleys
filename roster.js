@@ -25,17 +25,33 @@ app.post( "/AlleysRoster/", function (request, response) {
 
 
 
+app.get("/AlleysRoster/Cheapest", function(request, response) {
+	mongoClient.connect("mongodb://localhost/AlleysDB",
+	function(error, db) {
+		handleDatabaseError(error)
+		var collection = getDatabaseCollection(db)
+		collection.findOne({$query:{},$orderby:{_id:-1}},
+			function(error, result) {
+				if (error) throw error
+				response.json(result.value)
+				db.close()
+		})// .sort({value:1}).limit(1).pretty()
+	})
+})
+
+
+
 app.get( "/AlleysRoster/:key", function (request, response) {
 	var key = request.params.key
 	mongoClient.connect("mongodb://localhost/AlleysDB",
 	function(error, db) {
-	handleDatabaseError(error)
-	var collection = getDatabaseCollection(db)
-	collection.findOne( { key : key },
-		function(error, result) {
-			if (error) throw error
-			response.json(result.value)
-			db.close()
+		handleDatabaseError(error)
+		var collection = getDatabaseCollection(db)
+		collection.findOne( { key : key },
+			function(error, result) {
+				if (error) throw error
+				response.json(result.value)
+				db.close()
 		})
 	})
 })
