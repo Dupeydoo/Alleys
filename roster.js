@@ -13,8 +13,7 @@ app.post( "/AlleysRoster/", function ( request, response ) {
 	mongoClient.connect( "mongodb://localhost/AlleysDB",
 	function( error, db ) {
 		if ( error ) throw error
-		var database = db.db( "AlleysDB" )
-		var collection = database.collection( "AlleysColl" )
+		var collection = getDatabaseCollection(db)
 		collection.save( keyValue,
 		function( error, result ) {
 			if ( error ) throw error
@@ -32,8 +31,7 @@ app.get( "/AlleysRoster/:key", function ( request, response ) {
 	mongoClient.connect( "mongodb://localhost/AlleysDB",
 	function( error, db ) {
 	if ( error ) throw error
-	var database = db.db( "AlleysDB" )
-	var collection = database.collection( "AlleysColl" )
+	var collection = getDatabaseCollection(db)
 	collection.findOne( { key : key },
 		function( error, result ) {
 			if ( error ) throw error
@@ -50,8 +48,7 @@ app.get("/AlleysRoster/", function (request, response) {
 	mongoClient.connect( "mongodb://localhost/AlleysDB",
 	function( error, db ) {
 		if ( error ) throw error
-		var database = db.db( "AlleysDB" )
-		var collection = database.collection( "AlleysColl" )
+		var collection = getDatabaseCollection(db)
 		var keys = []
 
 		collection.find().toArray(
@@ -76,8 +73,7 @@ app.put("/AlleysRoster/:key", function (request, response) {
 	mongoClient.connect( "mongodb://localhost/AlleysDB",
 	function( error, db ) {
 		if ( error ) throw error
-		var database = db.db( "AlleysDB" )
-		var collection = database.collection( "AlleysColl" )
+		var collection = getDatabaseCollection(db)
 		collection.update( { key : key }, keyValue, {upsert : true},
 			function( error, result ) {
 				if ( error ) throw error
@@ -94,8 +90,7 @@ app.delete("/AlleysRoster/:key", function(request, response) {
 	mongoClient.connect("mongodb://localhost/AlleysDB",
 		function(error, db) {
 			if(error) throw error
-			var database = db.db("AlleysDB")
-			var collection = database.collection("AlleysColl")
+			var collection = getDatabaseCollection(db)
 			collection.deleteOne({key : key},
 				function(error, result) {
 					if(error) throw error
@@ -103,6 +98,13 @@ app.delete("/AlleysRoster/:key", function(request, response) {
 					db.close()
 			})
 	})
+})
+
+
+
+function getDatabaseCollection(db) {
+	var database = db.db("AlleysDB")
+	return database.collection("AlleysColl")
 }
 
 
