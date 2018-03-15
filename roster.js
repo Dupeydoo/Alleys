@@ -1,8 +1,8 @@
 const mongo = require( "mongodb" )
 const mongoClient = mongo.MongoClient
-
 const express = require( "express" )
 const bodyParser = require( "body-parser" )
+
 var app = express()
 app.use( bodyParser.json() )
 
@@ -12,7 +12,7 @@ app.post( "/AlleysRoster/", function ( request, response ) {
 	var keyValue = { key : request.body.key, value : request.body.value }
 	mongoClient.connect( "mongodb://localhost/AlleysDB",
 	function( error, db ) {
-		if ( error ) throw error
+		handleDatabaseError(error)
 		var collection = getDatabaseCollection(db)
 		collection.save( keyValue,
 		function( error, result ) {
@@ -25,12 +25,11 @@ app.post( "/AlleysRoster/", function ( request, response ) {
 
 
 
-
 app.get( "/AlleysRoster/:key", function ( request, response ) {
 	var key = request.params.key
 	mongoClient.connect( "mongodb://localhost/AlleysDB",
 	function( error, db ) {
-	if ( error ) throw error
+	handleDatabaseError(error)
 	var collection = getDatabaseCollection(db)
 	collection.findOne( { key : key },
 		function( error, result ) {
@@ -43,11 +42,10 @@ app.get( "/AlleysRoster/:key", function ( request, response ) {
 
 
 
-
 app.get("/AlleysRoster/", function (request, response) {
 	mongoClient.connect( "mongodb://localhost/AlleysDB",
 	function( error, db ) {
-		if ( error ) throw error
+		handleDatabaseError(error)
 		var collection = getDatabaseCollection(db)
 		var keys = []
 
@@ -72,7 +70,7 @@ app.put("/AlleysRoster/:key", function (request, response) {
 	var keyValue = { key : request.body.key, value : request.body.value }
 	mongoClient.connect( "mongodb://localhost/AlleysDB",
 	function( error, db ) {
-		if ( error ) throw error
+		handleDatabaseError(error)
 		var collection = getDatabaseCollection(db)
 		collection.update( { key : key }, keyValue, {upsert : true},
 			function( error, result ) {
@@ -89,7 +87,7 @@ app.delete("/AlleysRoster/:key", function(request, response) {
 	var key = request.params.key
 	mongoClient.connect("mongodb://localhost/AlleysDB",
 		function(error, db) {
-			if(error) throw error
+			handleDatabaseError(error)
 			var collection = getDatabaseCollection(db)
 			collection.deleteOne({key : key},
 				function(error, result) {
@@ -105,6 +103,15 @@ app.delete("/AlleysRoster/:key", function(request, response) {
 function getDatabaseCollection(db) {
 	var database = db.db("AlleysDB")
 	return database.collection("AlleysColl")
+}
+
+
+
+function handleDatabaseError(error) {
+	if(error) {
+		response.status(500).send("A team of highly trained monkeys " 
+			+ "has been dispatched to deal with the situation.")
+	}
 }
 
 
