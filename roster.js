@@ -25,7 +25,7 @@ app.post( "/AlleysRoster/", function (request, response) {
 
 
 
-app.get("/AlleysRoster/Cheapest", function(request, response) {
+app.get("/AlleysRoster", function(request, response) {
 	mongoClient.connect("mongodb://localhost/AlleysDB",
 	function(error, db) {
 		handleDatabaseError(error)
@@ -52,29 +52,6 @@ app.get( "/AlleysRoster/:key", function (request, response) {
 				if (error) throw error
 				response.json(result.value)
 				db.close()
-		})
-	})
-})
-
-
-
-app.get("/AlleysRoster/", function (request, response) {
-	mongoClient.connect("mongodb://localhost/AlleysDB",
-	function(error, db) {
-		handleDatabaseError(error)
-		var collection = getDatabaseCollection(db)
-		var keys = []
-
-		collection.find().toArray(
-		function(error, result) {
-			if (error) throw error
-
-			for (i = 0; i < result.length; i++) {
-				keys.push( result[i].key )
-			}
-
-			response.json(keys)
-			db.close()
 		})
 	})
 })
