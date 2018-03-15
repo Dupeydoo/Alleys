@@ -3,17 +3,17 @@ var app = express()
 
 
 
-app.get( "/AlleysSurge/:aRoad&:journeyTime&:rosterCount", function ( request, response ) {
+app.get( "/AlleysSurge/:aRoad&:rosterCount", function ( request, response ) {
 	var aRoad = request.params.aRoad
-	var journeyTime = request.params.journeyTime
 	var rosterCount = request.params.rosterCount
+	var journeyTime = new Date()
 	var multiplier = 1
 
 	if(aRoad) {
 		multiplier *= 2
 	}
 
-	if(journeyTime /*.getHours()*/ > 22 || journeyTime /*.getHours() */ < 5) {
+	if(journeyTime.getHours() > 22 || journeyTime.getHours() < 5) {
 		multiplier *= 2
 	}
 
