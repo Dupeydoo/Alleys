@@ -1,9 +1,6 @@
-const http = require("http")
-const querystring = require('querystring');
-
-
-const express = require( "express" )
-const bodyParser = require( "body-parser" )
+const request = require('request')
+const express = require("express")
+const bodyParser = require("body-parser")
 
 
 var app = express()
@@ -21,36 +18,20 @@ app.post("/AlleysRider/", function(request, response) {
 
 
 function getMappingInformation(start, end, response) {
-	var request = http.request({
-		protocol: "http:",
-		host: "localhost",
-		port: "3002",
-		path: "/AlleysMapping/" 
-			+ start.toString() 
-			+ "/" 
-			+ end.toString(),
-		method: "GET"
-	}, 
+	request("http://localhost:3002/AlleysMapping/" 
+		+ start.toString() 
+		+ "/" 
+		+ end.toString(),
 
-	function(mapResponse) {
-		var responseBody = ""
-		mapResponse.on("data", function(resultData) {
-			responseBody += resultData
+		function(error, mapResponse, body) {
+			if(error) {
+				response.status(500).send("A team of highly trained monkeys has been dispatched to deal with the situation.")
+			}
+
+			else {
+				response.json(body)
+			}
 		})
-
-		mapResponse.on("end", function() {
-			var distances = JSON.parse(responseBody)
-			response.json(distances)
-		})
-	})
-
-	request.on("error", function(error) {
-		console.log(error.message)
-		response.send("500: Internal Server Error: A team of highly trained monkeys " 
-			+ "has been dispatched to deal with the situation.")
-	})
-	
-	request.end()
 }
 
 
