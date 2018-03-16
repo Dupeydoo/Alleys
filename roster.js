@@ -10,7 +10,7 @@ app.use(bodyParser.json())
 
 app.post( "/AlleysRoster/", function (request, response) {
 	var keyValue = { name : request.body.name, rate : request.body.rate }
-	if(!validateInput("create", response, keyValue.name, keyValue.rate)) return false
+	if(!validateInput("create", response, keyValue)) return false
 
 	mongoClient.connect("mongodb://localhost/AlleysDB",
 	function(error, db) {
@@ -52,12 +52,16 @@ app.get( "/AlleysRoster/:name", function (request, response) {
 	var name = request.params.name
 	mongoClient.connect("mongodb://localhost/AlleysDB",
 	function(error, db) {
-		handleDatabaseError(error, respose)
+		handleDatabaseError(error, response)
 		var collection = getDatabaseCollection(db)
 		collection.findOne( { name : name },
 			function(error, result) {
-				handleDatabaseError(error, response)
-				response.json(result.rate)
+				if(result === null) {
+					writeErrorResponse(response, 404, "404: The resource could not be found.")	
+				} else {
+					handleDatabaseError(error, response)
+					response.json(result.rate)
+				}
 				db.close()
 		})
 	})
@@ -68,6 +72,8 @@ app.get( "/AlleysRoster/:name", function (request, response) {
 app.put("/AlleysRoster/:name", function (request, response) {
 	var name = request.params.name
 	var keyValue = { name : request.body.name, rate : request.body.rate }
+	if(!validateInput("update", response, keyValue, name)) return false
+
 	mongoClient.connect("mongodb://localhost/AlleysDB",
 	function(error, db) {
 		handleDatabaseError(error, response)
@@ -91,6 +97,7 @@ app.delete("/AlleysRoster/:name", function(request, response) {
 			var collection = getDatabaseCollection(db)
 			collection.deleteOne({name : name},
 				function(error, result) {
+					handleDatabaseError(error, response)
 					if(result.deletedCount === 0) {
 						writeErrorResponse(response, 200, "200 Ok, but this record " 
 							+ "does not exist! Nothing deleted.")
@@ -120,19 +127,27 @@ function handleDatabaseError(error, response) {
 
 
 
-function validateInput(method="create", response, name=0, rate=0) {
-	switch(method) {
-		case "create":
-			if(!name || !rate || !Number.isInteger(rate)) {
-				writeErrorResponse(response, 400, "400 Bad Request: Did you" 
-					+ " provide a string name for the driver and " 
-					+ "a number for the rate?")
-				return false
-			}
-
-		default:
-			return true
+function validateInput(method="create", response, nameRate=0, name=0) {
+	if(method === "create") {
+		var rate = nameRate.rate
+		if(!nameRate.name || !rate || !Number.isInteger(rate)) {
+			writeErrorResponse(response, 400, "400 Bad Request: Did you" 
+				+ " provide a string name for the driver and " 
+				+ "a number for the rate?")
+			return false
+		}
 	}
+
+	else if(method === "update") {
+		var rate = nameRate.rate
+		if(!nameRate.name || !rate || !Number.isInteger(rate) || !name) {
+			writeErrorResponse(response, 400, "400 Bad Request: Did you" 
+				+ " provide a string driver name, a number for the rate" 
+				+ " and a name to update?")
+			return false
+		}
+	}
+	return true
 }
 
 
