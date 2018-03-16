@@ -25,12 +25,6 @@ app.get( "/AlleysSurge/:surgeParameters", function(request, response) {
 
 
 
-app.listen( 3001, function () {
-	console.log( "listening on port 3001..." )
-})
-
-
-
 function calculatePrice(normalPrice, aPrice, journeyTime, driverCount) {
 	if(journeyTime.getHours() > 22 && journeyTime.getHours() < 5) {
 		normalPrice *= MULTIPLIER
@@ -44,3 +38,29 @@ function calculatePrice(normalPrice, aPrice, journeyTime, driverCount) {
 
 	return normalPrice + aPrice
 }
+
+
+
+function writeErrorResponse(response, code, message) {
+	response.status(code).send(message)
+}
+
+
+
+app.listen( 3001, function () {
+	console.log( "listening on port 3001..." )
+})
+
+
+
+app.use(function(request, response, next) {
+    writeErrorResponse(response, 404, "404: The resource could not be found!");
+});
+
+
+
+app.use(function(error, request, response, next) {
+	writeErrorResponse(response, 500, "500:Internal Server Error, A " 
+		+ "team of highly trained monkeys has been dispatched to deal" 
+		+ " with the situation.")
+})
