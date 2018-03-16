@@ -1,0 +1,13 @@
+LABEL version=1.0
+LABEL description=”Docker file \
+to build the rider image.”
+
+FROM node:latest
+MAINTAINER Dupeydoo
+
+RUN npm install request
+RUN npm install express
+RUN npm install body-parser
+
+WORKDIR /usr/src/rider
+CMD node rider.js

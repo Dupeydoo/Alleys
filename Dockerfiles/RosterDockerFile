@@ -1,0 +1,13 @@
+LABEL version=1.0
+LABEL description=”Docker file \
+to build the roster image.”
+
+FROM node:latest
+MAINTAINER Dupeydoo
+
+RUN npm install mongodb
+RUN npm install express
+RUN npm install body-parser
+
+WORKDIR /usr/src/roster
+CMD node roster.js

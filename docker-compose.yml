@@ -1,0 +1,79 @@
+version: "3"
+#implement logging.
+services:
+
+    mapping:
+        build:
+            context: ./Alleys/Dockerfiles/
+            dockerfile: MappingDockerFile
+        command: node mapping.js
+        ports:
+            - "3000:3000"
+        environment:
+            MAPPING_PORT: 3000
+        volumes:
+            - ./Alleys/:/usr/src/mapping
+        networks:
+            - alleys-net
+
+    roster:
+        build:
+            context: ./Alleys/Dockerfiles/
+            dockerfile: RosterDockerFile
+        command: node roster.js
+        ports:
+            - "3001:3001"
+        environment:
+            ROSTER_PORT: 3001
+        volumes:
+            - ./Alleys/:/usr/src/roster
+        depends_on:
+            - rostermongo
+        networks:
+            - alleys-net
+
+    rostermongo:
+        image: mongo:latest
+        ports:
+            - "1337:1337"
+        #volumes:
+        #    - ./mongo_db/:/data/db
+        networks:
+            - alleys-net
+
+    surge:
+        build:
+            context: ./Alleys/Dockerfiles/
+            dockerfile: SurgeDockerFile
+        command: node surgepricing.js
+        ports:
+            - "3002:3002"
+        environment:
+            SURGE_PORT: 3002
+        volumes:
+            - ./Alleys/:/usr/src/surge
+        networks:
+            - alleys-net
+
+    rider:
+        build:
+            context: ./Alleys/Dockerfiles/
+            dockerfile: RiderDockerFile
+        command: node rider.js
+        ports:
+            - "3003:3003"    
+        environment:
+            RIDER_PORT: 3003
+        volumes:
+            - ./Alleys/:usr/src/rider
+        depends_on:
+            - mapping
+            - roster
+            - surge
+        networks:
+            - alleys-net
+
+
+networks:
+  alleys-net:
+    driver: bridge
