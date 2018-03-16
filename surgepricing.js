@@ -1,6 +1,7 @@
 const express = require( "express" )
 var app = express()
 
+const SURGE_PORT = process.env.SURGE_PORT ? process.env.SURGE_PORT : 3002
 const DRIVER_LIMIT = 5
 const MULTIPLIER = 2
 
@@ -47,8 +48,8 @@ function writeErrorResponse(response, code, message) {
 
 
 
-app.listen( 3001, function () {
-	console.log( "listening on port 3001..." )
+app.listen(SURGE_PORT, function() {
+	console.log("Surge pricing is listening on " + SURGE_PORT.toString())
 })
 
 

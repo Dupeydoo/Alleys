@@ -3,6 +3,8 @@ const mongoClient = mongo.MongoClient
 const express = require("express")
 const bodyParser = require("body-parser")
 
+const ROSTER_PORT = process.env.ROSTER_PORT ? process.env.ROSTER_PORT : 3001
+
 var app = express()
 app.use(bodyParser.json())
 

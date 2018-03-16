@@ -3,6 +3,7 @@ const express = require( "express" )
 var app = express()
 
 const mapsApiKey = "AIzaSyAMmf0RuNmg3VO3GVFGL1SJaKz4m2QAuVI"
+const MAPPING_PORT = process.env.MAPPING_PORT ? process.env.MAPPING_PORT : 3000
 
 
 app.get("/AlleysMapping/:start/:end", function(mapRequest, response) {
@@ -57,8 +58,8 @@ function writeErrorResponse(response, code, message) {
 
 
 
-app.listen( 3002, function () {
-	console.log( "listening on port 3002..." )
+app.listen(MAPPING_PORT, function() {
+	console.log("Mapping is listening on " + MAPPING_PORT.toString())
 })
 
 

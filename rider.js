@@ -1,7 +1,8 @@
-const request = require('request')
+const request = require("request")
 const express = require("express")
 const bodyParser = require("body-parser")
 
+const RIDER_PORT = process.env.RIDER_PORT ? process.env.RIDER_PORT : 3003
 
 var app = express()
 app.use(bodyParser.json())
@@ -19,7 +20,7 @@ app.post("/AlleysRider/", function(request, response) {
 
 
 function getBestDriverPrice(start, end, response) {
-	request("http://localhost:3002/AlleysMapping/" 
+	request("http://localhost:3002/AlleysMapping/"
 		+ start.toString() 
 		+ "/" 
 		+ end.toString(),
@@ -96,8 +97,8 @@ function writeErrorResponse(response, code, message) {
 
 
 
-app.listen( 3003, function () {
-	console.log( "listening on port 3003..." )
+app.listen(RIDER_PORT, function() {
+	console.log("Rider is listening on " + RIDER_PORT.toString())
 })
 
 
