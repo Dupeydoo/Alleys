@@ -4,6 +4,10 @@ const express = require("express")
 const bodyParser = require("body-parser")
 
 const ROSTER_PORT = process.env.ROSTER_PORT ? process.env.ROSTER_PORT : 3001
+const MONGO_PROTOCOL = "mongodb://"
+const MONGO_SERVICE = MONGO_PROTOCOL + "rostermongo/AlleysDB"
+const MONGO_LOCAL = MONGO_PROTOCOL + "localhost/AlleysDB"
+
 
 var app = express()
 app.use(bodyParser.json())
@@ -14,7 +18,7 @@ app.post( "/AlleysRoster/", function (request, response) {
 	var keyValue = { name : request.body.name, rate : request.body.rate }
 	if(!validateInput("create", response, keyValue)) return false
 
-	mongoClient.connect("mongodb://localhost/AlleysDB",
+	mongoClient.connect(MONGO_SERVICE,
 	function(error, db) {
 		handleDatabaseError(error, response)
 		var collection = getDatabaseCollection(db)
@@ -30,7 +34,7 @@ app.post( "/AlleysRoster/", function (request, response) {
 
 
 app.get("/AlleysRoster", function(request, response) {
-	mongoClient.connect("mongodb://localhost/AlleysDB",
+	mongoClient.connect(MONGO_SERVICE,
 	function(error, db) {
 		handleDatabaseError(error, response)
 		var collection = getDatabaseCollection(db)
@@ -52,7 +56,7 @@ app.get("/AlleysRoster", function(request, response) {
 
 app.get( "/AlleysRoster/:name", function (request, response) {
 	var name = request.params.name
-	mongoClient.connect("mongodb://localhost/AlleysDB",
+	mongoClient.connect(MONGO_SERVICE,
 	function(error, db) {
 		handleDatabaseError(error, response)
 		var collection = getDatabaseCollection(db)
@@ -76,7 +80,7 @@ app.put("/AlleysRoster/:name", function (request, response) {
 	var keyValue = { name : request.body.name, rate : request.body.rate }
 	if(!validateInput("update", response, keyValue, name)) return false
 
-	mongoClient.connect("mongodb://localhost/AlleysDB",
+	mongoClient.connect(MONGO_SERVICE,
 	function(error, db) {
 		handleDatabaseError(error, response)
 		var collection = getDatabaseCollection(db)
@@ -93,7 +97,7 @@ app.put("/AlleysRoster/:name", function (request, response) {
 
 app.delete("/AlleysRoster/:name", function(request, response) {
 	var name = request.params.name
-	mongoClient.connect("mongodb://localhost/AlleysDB",
+	mongoClient.connect(MONGO_SERVICE,
 		function(error, db) {
 			handleDatabaseError(error, response)
 			var collection = getDatabaseCollection(db)
@@ -160,8 +164,8 @@ function writeErrorResponse(response, code, message) {
 
 
 
-app.listen(3000, function() {
-	console.log("listening on port 3000...")
+app.listen(ROSTER_PORT, function() {
+	console.log("Roster is listening on " + ROSTER_PORT.toString())
 })
 
 

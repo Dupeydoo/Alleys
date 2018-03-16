@@ -4,7 +4,7 @@ services:
 
     mapping:
         build:
-            context: ./Alleys/Dockerfiles/
+            context: ./Dockerfiles/
             dockerfile: MappingDockerFile
         command: node mapping.js
         ports:
@@ -12,13 +12,13 @@ services:
         environment:
             MAPPING_PORT: 3000
         volumes:
-            - ./Alleys/:/usr/src/mapping
+            - ./:/usr/src/mapping
         networks:
             - alleys-net
 
     roster:
         build:
-            context: ./Alleys/Dockerfiles/
+            context: ./Dockerfiles/
             dockerfile: RosterDockerFile
         command: node roster.js
         ports:
@@ -26,7 +26,7 @@ services:
         environment:
             ROSTER_PORT: 3001
         volumes:
-            - ./Alleys/:/usr/src/roster
+            - ./:/usr/src/roster
         depends_on:
             - rostermongo
         networks:
@@ -43,7 +43,7 @@ services:
 
     surge:
         build:
-            context: ./Alleys/Dockerfiles/
+            context: ./Dockerfiles/
             dockerfile: SurgeDockerFile
         command: node surgepricing.js
         ports:
@@ -51,13 +51,13 @@ services:
         environment:
             SURGE_PORT: 3002
         volumes:
-            - ./Alleys/:/usr/src/surge
+            - ./:/usr/src/surge
         networks:
             - alleys-net
 
     rider:
         build:
-            context: ./Alleys/Dockerfiles/
+            context: ./Dockerfiles/
             dockerfile: RiderDockerFile
         command: node rider.js
         ports:
@@ -65,7 +65,7 @@ services:
         environment:
             RIDER_PORT: 3003
         volumes:
-            - ./Alleys/:usr/src/rider
+            - ./:/usr/src/rider
         depends_on:
             - mapping
             - roster

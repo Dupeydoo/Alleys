@@ -2,7 +2,7 @@ const request = require("request")
 const express = require( "express" )
 var app = express()
 
-const mapsApiKey = "AIzaSyAMmf0RuNmg3VO3GVFGL1SJaKz4m2QAuVI"
+const MAPS_API_KEY = "AIzaSyAMmf0RuNmg3VO3GVFGL1SJaKz4m2QAuVI"
 const MAPPING_PORT = process.env.MAPPING_PORT ? process.env.MAPPING_PORT : 3000
 
 
@@ -11,7 +11,7 @@ app.get("/AlleysMapping/:start/:end", function(mapRequest, response) {
 	var end = mapRequest.params.end
 
 	request("https://maps.googleapis.com/maps/api/directions/json?origin=" + start.toString() 
-		+ "&destination=" + end.toString() + "&region=uk&key=" + mapsApiKey,
+		+ "&destination=" + end.toString() + "&region=uk&key=" + MAPS_API_KEY,
 
 		function(error, apiResponse, body) {
 			var directions = JSON.parse(body)

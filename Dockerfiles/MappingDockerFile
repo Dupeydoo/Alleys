@@ -1,6 +1,6 @@
-LABEL version=1.0
-LABEL description=”Docker file \
-to build the mapping image.”
+# version="1.0"
+# description=”Docker file to
+# build the mapping image.”
 
 FROM node:latest
 MAINTAINER Dupeydoo

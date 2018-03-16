@@ -3,6 +3,9 @@ const express = require("express")
 const bodyParser = require("body-parser")
 
 const RIDER_PORT = process.env.RIDER_PORT ? process.env.RIDER_PORT : 3003
+const MAPPING_PORT = process.env.MAPPING_PORT ? process.env.MAPPING_PORT : 3000
+const ROSTER_PORT = process.env.ROSTER_PORT ? process.env.ROSTER_PORT : 3001
+const SURGE_PORT = process.env.SURGE_PORT ? process.env.SURGE_PORT : 3002
 
 var app = express()
 app.use(bodyParser.json())
@@ -20,10 +23,8 @@ app.post("/AlleysRider/", function(request, response) {
 
 
 function getBestDriverPrice(start, end, response) {
-	request("http://localhost:3002/AlleysMapping/"
-		+ start.toString() 
-		+ "/" 
-		+ end.toString(),
+	request("http://localhost:" + MAPPING_PORT.toString() 
+		+ "/AlleysMapping/" + start.toString() + "/" + end.toString(),
 
 		function(error, mapResponse, body) {
 			if(error) {
@@ -41,7 +42,7 @@ function getBestDriverPrice(start, end, response) {
 
 
 function getCheapestKmRate(distances, response) {
-	request("http://localhost:3000/AlleysRoster",	
+	request("http://localhost:" + ROSTER_PORT.toString() + "/AlleysRoster",	
 		function(error, rosterResponse, body) {
 			if(error) {
 				writeErrorResponse(response, 500, "500 Internal Server Error: " 
@@ -69,7 +70,7 @@ function getSurgePrice(distances, driver, response) {
 		driverCount: driver.count
 	}
 
-	request("http://localhost:3001/AlleysSurge/" 
+	request("http://localhost:" + SURGE_PORT.toString() + "/AlleysSurge/" 
 		+ JSON.stringify(surgeData),
 
 		function(error, surgeResponse, body) {
