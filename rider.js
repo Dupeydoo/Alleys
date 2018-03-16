@@ -6,6 +6,7 @@ const RIDER_PORT = process.env.RIDER_PORT ? process.env.RIDER_PORT : 3003
 const MAPPING_PORT = process.env.MAPPING_PORT ? process.env.MAPPING_PORT : 3000
 const ROSTER_PORT = process.env.ROSTER_PORT ? process.env.ROSTER_PORT : 3001
 const SURGE_PORT = process.env.SURGE_PORT ? process.env.SURGE_PORT : 3002
+const HOST = process.env.IS_DOCKER ? "192.168.99.100" : "localhost"
 
 var app = express()
 app.use(bodyParser.json())
@@ -23,9 +24,9 @@ app.post("/AlleysRider/", function(request, response) {
 
 
 function getBestDriverPrice(start, end, response) {
-	request("http://localhost:" + MAPPING_PORT.toString() 
-		+ "/AlleysMapping/" + start.toString() + "/" + end.toString(),
-
+	var mapUrl = "http://" + HOST + ":" + MAPPING_PORT 
+		+ "/AlleysMapping/" + start + "/" + end
+	request(mapUrl,
 		function(error, mapResponse, body) {
 			if(error) {
 				writeErrorResponse(response, 500, "500 Internal Server Error: " 
@@ -42,7 +43,8 @@ function getBestDriverPrice(start, end, response) {
 
 
 function getCheapestKmRate(distances, response) {
-	request("http://localhost:" + ROSTER_PORT.toString() + "/AlleysRoster",	
+	var rosterUrl = "http://" + HOST + ":" + ROSTER_PORT + "/AlleysRoster"
+	request(rosterUrl,	
 		function(error, rosterResponse, body) {
 			if(error) {
 				writeErrorResponse(response, 500, "500 Internal Server Error: " 
@@ -69,12 +71,20 @@ function getSurgePrice(distances, driver, response) {
 		rate: driver.rate,
 		driverCount: driver.count
 	}
+	var surgeUrl = "http://" + HOST + ":" + SURGE_PORT + "/AlleysSurge/" 
+		+ JSON.stringify(surgeData)
 
-	request("http://localhost:" + SURGE_PORT.toString() + "/AlleysSurge/" 
-		+ JSON.stringify(surgeData),
-
+	request(surgeUrl,
 		function(error, surgeResponse, body) {
-			response.send(body)
+			if(error) {
+				writeErrorResponse(response, 500, "500 Internal Server Error: " 
+					+ "A team of highly trained monkeys has been dispatched to " 
+					+ "deal with the situation.")
+			}
+
+			else {
+				response.status(200).send(body)
+			}
 		}
 	)
 }
@@ -85,6 +95,12 @@ function validateStartEnd(response, start, end) {
 	if(!start || !end || Number.isInteger(start) || Number.isInteger(end)) {
 		writeErrorResponse(response, 400, "400 Bad Request: Valid start and " 
 			+ "end locations must be provided!")
+		return false
+	}
+
+	else if(start === end) {
+		writeErrorResponse(response, 400, "400 Bad Request: You cannot go to " 
+			+ "the same place, please enter different locations.")
 		return false
 	}
 	return true

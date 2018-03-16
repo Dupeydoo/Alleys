@@ -7,5 +7,5 @@ MAINTAINER Dupeydoo
 
 RUN npm install express
 
-WORKDIR /usr/src/roster
+WORKDIR /usr/src/surge
 CMD node surgepricing.js

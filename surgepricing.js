@@ -7,26 +7,23 @@ const MULTIPLIER = 2
 
 
 app.get( "/AlleysSurge/:surgeParameters", function(request, response) {
-	var surgeParameters = JSON.parse(request.params.surgeParameters)
-	var parameters = surgeParameters
-	var journeyTime = new Date()
-
+	var parameters = JSON.parse(request.params.surgeParameters)
 	var totalDistance = parameters.totalDistance / 1000
 	var aDistance = parameters.aDistance / 1000
-	var driver = parameters.driver
 	var rate = parameters.rate
-	var driverCount = parameters.driverCount
 
 	var normalPrice = (totalDistance - aDistance) * rate
 	var aPrice = MULTIPLIER * (aDistance * rate)
-	var price = calculatePrice(normalPrice, aPrice, journeyTime, driverCount)
+	var price = calculatePrice(normalPrice, aPrice, parameters.driverCount)
 	
-	response.send("Driver: " + driver.toString() + ", " + "Price: " + (price / 100).toFixed(2) + " Pound Sterling.")
+	response.status(200).send("Driver: " + parameters.driver + ", " 
+		+ "Price: " + (price / 100).toFixed(2) + " Pound Sterling.")
 })
 
 
 
-function calculatePrice(normalPrice, aPrice, journeyTime, driverCount) {
+function calculatePrice(normalPrice, aPrice, driverCount) {
+	var journeyTime = new Date()
 	if(journeyTime.getHours() > 22 && journeyTime.getHours() < 5) {
 		normalPrice *= MULTIPLIER
 		aPrice *= MULTIPLIER
@@ -36,7 +33,6 @@ function calculatePrice(normalPrice, aPrice, journeyTime, driverCount) {
 		normalPrice *= MULTIPLIER
 		aPrice *= MULTIPLIER
 	}
-
 	return normalPrice + aPrice
 }
 
@@ -49,7 +45,7 @@ function writeErrorResponse(response, code, message) {
 
 
 app.listen(SURGE_PORT, function() {
-	console.log("Surge pricing is listening on " + SURGE_PORT.toString())
+	console.log("Surge pricing is listening on " + SURGE_PORT)
 })
 
 

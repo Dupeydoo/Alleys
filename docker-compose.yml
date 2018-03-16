@@ -35,7 +35,7 @@ services:
     rostermongo:
         image: mongo:latest
         ports:
-            - "1337:1337"
+            - "27017:27017"
         #volumes:
         #    - ./mongo_db/:/data/db
         networks:
@@ -64,6 +64,7 @@ services:
             - "3003:3003"    
         environment:
             RIDER_PORT: 3003
+            IS_DOCKER: "true"
         volumes:
             - ./:/usr/src/rider
         depends_on:

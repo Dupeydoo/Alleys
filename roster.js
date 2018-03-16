@@ -14,9 +14,10 @@ app.use(bodyParser.json())
 
 
 
+
 app.post( "/AlleysRoster/", function (request, response) {
 	var keyValue = { name : request.body.name, rate : request.body.rate }
-	if(!validateInput("create", response, keyValue)) return false
+	if(!validateInput("create", response, keyValue)) { return false }
 
 	mongoClient.connect(MONGO_SERVICE,
 	function(error, db) {
@@ -25,7 +26,7 @@ app.post( "/AlleysRoster/", function (request, response) {
 		collection.save(keyValue,
 		function(error, result) {
 			handleDatabaseError(error, response)
-			response.json(keyValue)
+			response.status(201).json(keyValue)
 			db.close()
 		})
 	})
@@ -41,12 +42,19 @@ app.get("/AlleysRoster", function(request, response) {
 		var min = collection.find().sort({rate: 1}).limit(1)
 			.forEach(function(minimum) {
 				collection.count(function(error, result) {
-					handleDatabaseError(error, response)
-					response.json({
-						driver: minimum.name, 
-						rate: minimum.rate, 
-						count: result
-					})
+					if(result > 0) {
+						handleDatabaseError(error, response)
+						response.status(200).json({
+							driver: minimum.name, 
+							rate: minimum.rate, 
+							count: result
+						})
+					}
+
+					else {
+						writeErrorResponse(response, 404, "404: The " + 
+							"resource could not be found.")
+					}
 				})
 			})
 	})
@@ -63,10 +71,11 @@ app.get( "/AlleysRoster/:name", function (request, response) {
 		collection.findOne( { name : name },
 			function(error, result) {
 				if(result === null) {
-					writeErrorResponse(response, 404, "404: The resource could not be found.")	
+					writeErrorResponse(response, 404, "404: The " 
+						+ " resource could not be found.")	
 				} else {
 					handleDatabaseError(error, response)
-					response.json(result.rate)
+					response.status(200).json(result.rate)
 				}
 				db.close()
 		})
@@ -78,7 +87,7 @@ app.get( "/AlleysRoster/:name", function (request, response) {
 app.put("/AlleysRoster/:name", function (request, response) {
 	var name = request.params.name
 	var keyValue = { name : request.body.name, rate : request.body.rate }
-	if(!validateInput("update", response, keyValue, name)) return false
+	if(!validateInput("update", response, keyValue, name)) { return false }
 
 	mongoClient.connect(MONGO_SERVICE,
 	function(error, db) {
@@ -87,7 +96,7 @@ app.put("/AlleysRoster/:name", function (request, response) {
 		collection.update( { name : name }, keyValue, {upsert : true},
 			function(error, result) {
 				handleDatabaseError(error, response)
-				response.json(keyValue)
+				response.status(200).json(keyValue)
 				db.close()
 		})
 	})
@@ -105,10 +114,10 @@ app.delete("/AlleysRoster/:name", function(request, response) {
 				function(error, result) {
 					handleDatabaseError(error, response)
 					if(result.deletedCount === 0) {
-						writeErrorResponse(response, 200, "200 Ok, but this record " 
-							+ "does not exist! Nothing deleted.")
+						writeErrorResponse(response, 204, "204 No Content: " 
+							+ "The resource does not exist! Nothing deleted.")
 					} else {
-						response.json(name)
+						response.status(200).json(name)
 					}
 					db.close()
 			})
@@ -165,7 +174,7 @@ function writeErrorResponse(response, code, message) {
 
 
 app.listen(ROSTER_PORT, function() {
-	console.log("Roster is listening on " + ROSTER_PORT.toString())
+	console.log("Roster is listening on " + ROSTER_PORT)
 })
 
 
