@@ -50,6 +50,6 @@ app.listen( 3002, function () {
 
 
 
-app.use(function(error, request, response, next){
+app.use(function(request, response, next){
     response.status(404).send("The page could not be found!");
 });
