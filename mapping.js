@@ -13,16 +13,23 @@ app.get("/AlleysMapping/:start/:end", function(mapRequest, response) {
 		+ "&destination=" + end.toString() + "&region=uk&key=" + mapsApiKey,
 
 		function(error, apiResponse, body) {
+			var directions = JSON.parse(body)
+			var totalDistance = directions.routes[0].legs[0].distance.value
 			if(error) {
-				response.status(500).send("A team of highly trained monkeys " 
+				writeErrorResponse(response, 500, "A team of highly trained monkeys " 
 					+ "has been dispatched to deal with the situation.")
 			}
 
+			else if(totalDistance === 0) {
+				writeErrorResponse(response, 400, "400 Bad Request: Did you" 
+				+ " provide a valid location for the start and " 
+				+ "end locations?")
+			}
+
 			else {
-				var directions = JSON.parse(body)
 				var aRoadDistance = calculateARoadDistance(directions.routes[0].legs[0].steps)
 				response.json(
-					{totalDistance: directions.routes[0].legs[0].distance.value, aDistance: aRoadDistance}
+					{totalDistance: totalDistance, aDistance: aRoadDistance}
 				)
 			}
 		})
@@ -50,6 +57,20 @@ app.listen( 3002, function () {
 
 
 
-app.use(function(request, response, next){
-    response.status(404).send("The page could not be found!");
+function writeErrorResponse(response, code, message) {
+	response.status(code).send(message)
+}
+
+
+
+app.use(function(request, response, next) {
+    writeErrorResponse(response, 404, "404: The resource could not be found!");
 });
+
+
+
+app.use(function(error, request, response, next) {
+	writeErrorResponse(response, 500, "500:Internal Server Error, A " 
+		+ "team of highly trained monkeys has been dispatched to deal" 
+		+ " with the situation.")
+})
