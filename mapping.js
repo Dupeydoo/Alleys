@@ -51,15 +51,15 @@ function calculateARoadDistance(routeSteps) {
 
 
 
-app.listen( 3002, function () {
-	console.log( "listening on port 3002..." )
-})
-
-
-
 function writeErrorResponse(response, code, message) {
 	response.status(code).send(message)
 }
+
+
+
+app.listen( 3002, function () {
+	console.log( "listening on port 3002..." )
+})
 
 
 
