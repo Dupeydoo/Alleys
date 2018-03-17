@@ -69,28 +69,6 @@ app.get("/AlleysRoster", function(request, response) {
 })
 
 
-app.get( "/AlleysRoster/:name", function (request, response) {
-	var name = request.params.name
-	
-	mongoClient.connect(MONGO_SERVICE,
-	function(error, db) {
-		handleDatabaseError(error, response)
-		var collection = getDatabaseCollection(db, response)
-		
-		collection.findOne({ name : name },
-			function(error, result) {
-				if(result === null) {
-					writeErrorResponse(response, 404, notFound)	
-				} else {
-					handleDatabaseError(error, response)
-					response.status(200).json(result.rate)
-				}
-				db.close()
-		})
-	})
-})
-
-
 app.put("/AlleysRoster/:name", function (request, response) {
 	var name = request.params.name
 	var keyValue = { name : request.body.name, rate : request.body.rate }
