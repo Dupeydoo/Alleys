@@ -40,30 +40,31 @@ app.get("/AlleysRoster", function(request, response) {
 	function(error, db) {
 		handleDatabaseError(error, response)
 		var collection = getDatabaseCollection(db, response)
-		
-		var min =collection.find().sort({rate: 1}).limit(1)
+		var min = collection.find().sort({rate: 1}).limit(1)
 
-		if(min.count() > 0) {
-			min.forEach(function(minimum) {
-				
-				collection.count(function(error, result) {
-					if(result > 0) {
-						handleDatabaseError(error, response)
-						response.status(200).json({driver: minimum.name, 
-							rate: minimum.rate, count: result
-						})
-					}
+		min.count(function(error, count) {
+			if(count > 0) {
+				min.forEach(function(minimum) {
+					
+					collection.count(function(error, result) {
+						if(result > 0) {
+							handleDatabaseError(error, response)
+							response.status(200).json({driver: minimum.name, 
+								rate: minimum.rate, count: result
+							})
+						}
 
-					else {
-						writeErrorResponse(response, 404, notFound)
-					}
+						else {
+							writeErrorResponse(response, 404, notFound)
+						}
+					})
 				})
-			})
-		}
+			}
 
-		else {
-			writeErrorResponse(response, 404, notFound)
-		}
+			else {
+				writeErrorResponse(response, 404, notFound)
+			}
+		})
 	})
 })
 
