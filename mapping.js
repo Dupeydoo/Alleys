@@ -5,6 +5,9 @@ var app = express()
 const MAPS_API_KEY = "AIzaSyAMmf0RuNmg3VO3GVFGL1SJaKz4m2QAuVI"
 const MAPPING_PORT = process.env.MAPPING_PORT ? process.env.MAPPING_PORT : 3000
 
+var serverError = "500 Internal Server Error: Something has gone wrong on the server. Please try again in a little while."
+var notFound = "404 Not Found: The resource could not be found!"
+
 
 app.get("/AlleysMapping/:start/:end", function(mapRequest, response) {
 	var start = mapRequest.params.start
@@ -19,7 +22,6 @@ app.get("/AlleysMapping/:start/:end", function(mapRequest, response) {
 		}
 
 		var totalDistance = directions.routes[0].legs[0].distance.value
-
 		if(checkMapResponse(error, response, totalDistance)) {
 			var aRoadDistance = calculateARoadDistance(directions.routes[0].legs[0].steps)
 			response.status(200).json(
@@ -28,7 +30,6 @@ app.get("/AlleysMapping/:start/:end", function(mapRequest, response) {
 		}
 	})
 })
-
 
 
 function calculateARoadDistance(routeSteps) {
@@ -44,24 +45,20 @@ function calculateARoadDistance(routeSteps) {
 }
 
 
-
 function checkMapResponse(error, response, totalDistance) {
 	if(error) {
-		writeErrorResponse(response, 500, "500 Internal Server Error: " 
-			+ "A team of highly trained monkeys has been dispatched " 
-			+ "to deal with the situation.")
+		writeErrorResponse(response, 500, serverError)
 		return false
 	}
 
 	else if(totalDistance === 0 || totalDistance === undefined) {
-		writeErrorResponse(response, 400, "400 Bad Request: Did you" 
-		+ " provide a valid location for the start and " 
-		+ "end locations?")
+		var badRequest = "400 Bad Request: Did you provide a valid " 
+			+ "location for the start and end locations?"
+		writeErrorResponse(response, 400, badRequest)
 		return false
 	}
 	return true
 }
-
 
 
 function checkJsonResponse(response, directions) {
@@ -71,22 +68,23 @@ function checkJsonResponse(response, directions) {
 	 } 
 
 	 else if(status === "NOT_FOUND") {
-	 	writeErrorResponse(response, 404, "404 Not Found: " 
-			+ "The start or end location could not be " 
-			+ "geocoded.")
+	 	writeErrorResponse(response, 404, notFound + "Could not geocode locations.")
 	 	return false
 	 }
-	 writeErrorResponse(response, 503, "503 Temporarily " 
-	 	+ "Unavailable: " + status)
+	 writeErrorResponse(response, 503, "503 Temporarily Unavailable: " + status)
 	 return false
 }
 
 
-
 function writeErrorResponse(response, code, message) {
 	response.status(code).send(message)
+	logError(code, message)
 }
 
+
+function logError(code, message) {
+	console.error(new Date().toDateString() + " [HTTP Code: " + code + ", Message: " + message + "]")
+}
 
 
 app.listen(MAPPING_PORT, function() {
@@ -94,15 +92,11 @@ app.listen(MAPPING_PORT, function() {
 })
 
 
-
 app.use(function(request, response, next) {
-    writeErrorResponse(response, 404, "404: The resource could not be found!");
+    writeErrorResponse(response, 404, notFound);
 });
 
 
-
 app.use(function(error, request, response, next) {
-	writeErrorResponse(response, 500, "500:Internal Server Error, A " 
-		+ "team of highly trained monkeys has been dispatched to deal" 
-		+ " with the situation.")
+	writeErrorResponse(response, 500, serverError)
 })

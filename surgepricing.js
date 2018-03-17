@@ -13,16 +13,20 @@ app.get( "/AlleysSurge/:surgeParameters", function(request, response) {
 	var rate = parameters.rate
 
 	var normalPrice = (totalDistance - aDistance) * rate
-	var aPrice = MULTIPLIER * (aDistance * rate)
-	var price = calculatePrice(normalPrice, aPrice, parameters.driverCount)
+	var aPrice = MULTIPLIER * (aDistance * rate) 
+	var price = calculateFinalPrice(normalPrice, aPrice, parameters.driverCount)
 	
 	response.status(200).send("Driver: " + parameters.driver + ", " 
-		+ "Price: " + (price / 100).toFixed(2) + " Pound Sterling.")
+		+ "Price: " + formatPrice(price) + " Pound Sterling.")
 })
 
 
+function formatPrice(price) {
+	return (price / 100).toFixed(2)
+}
 
-function calculatePrice(normalPrice, aPrice, driverCount) {
+
+function calculateFinalPrice(normalPrice, aPrice, driverCount) {
 	var journeyTime = new Date()
 	if(journeyTime.getHours() > 22 && journeyTime.getHours() < 5) {
 		normalPrice *= MULTIPLIER
@@ -37,11 +41,15 @@ function calculatePrice(normalPrice, aPrice, driverCount) {
 }
 
 
-
 function writeErrorResponse(response, code, message) {
 	response.status(code).send(message)
+	logError(code, message)
 }
 
+
+function logError(code, message) {
+	console.error(new Date().toDateString() + " [HTTP Code: " + code + ", Message: " + message + "]")
+}
 
 
 app.listen(SURGE_PORT, function() {
@@ -49,15 +57,13 @@ app.listen(SURGE_PORT, function() {
 })
 
 
-
 app.use(function(request, response, next) {
     writeErrorResponse(response, 404, "404: The resource could not be found!");
 });
 
 
-
 app.use(function(error, request, response, next) {
-	writeErrorResponse(response, 500, "500:Internal Server Error, A " 
-		+ "team of highly trained monkeys has been dispatched to deal" 
-		+ " with the situation.")
+	writeErrorResponse(response, 500, "500 Internal Server Error: " 
+		+ "Something has gone wrong on the server. Please try " 
+		+ "again in a little while.")
 })

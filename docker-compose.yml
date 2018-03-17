@@ -68,6 +68,7 @@ services:
         volumes:
             - ./:/usr/src/rider
         depends_on:
+            - rostermongo
             - mapping
             - roster
             - surge
