@@ -28,7 +28,7 @@ function getBestDriverPrice(start, end, response) {
 		+ "/AlleysMapping/" + start + "/" + end
 	request(mapUrl,
 		function(error, mapResponse, body) {
-			if(checkApiError(error, response)) {
+			if(checkApiError(error, response, mapResponse)) {
 				getCheapestKmRate(body, response)
 			}
 	})
@@ -40,12 +40,8 @@ function getCheapestKmRate(distances, response) {
 		+ "/AlleysRoster"
 	request(rosterUrl,	
 		function(error, rosterResponse, body) {
-			if(checkApiError(error, response) && rosterResponse.statusCode === 200) {
+			if(checkApiError(error, response, rosterResponse)) {
 				getSurgePrice(distances, body, response)
-			}
-
-			else {
-				writeErrorResponse(response, rosterResponse.statusCode, body)
 			}
 	})
 }
@@ -59,7 +55,7 @@ function getSurgePrice(distances, driver, response) {
 		+ "/AlleysSurge/" + JSON.stringify(surgeData)
 	request(surgeUrl, 
 		function(error, surgeResponse, body) {
-			if(checkApiError(error, response)) {
+			if(checkApiError(error, response, surgeResponse)) {
 				response.status(200).send(body)
 			}
 	})
@@ -82,9 +78,14 @@ function validateStartEnd(response, start, end) {
 }
 
 
-function checkApiError(error, response) {
+function checkApiError(error, response, apiResponse) {
 	if(error) {
 		writeErrorResponse(response, 500, serverError)
+		return false
+	}
+
+	else if(apiResponse.statusCode > 299) {
+		writeErrorResponse(response, apiResponse.statusCode, serverError)
 		return false
 	}
 	return true
