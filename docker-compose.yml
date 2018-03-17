@@ -64,7 +64,6 @@ services:
             - "3003:3003"    
         environment:
             RIDER_PORT: 3003
-            IS_DOCKER: "true"
         volumes:
             - ./:/usr/src/rider
         depends_on:

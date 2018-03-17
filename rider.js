@@ -6,7 +6,6 @@ const RIDER_PORT = process.env.RIDER_PORT ? process.env.RIDER_PORT : 3003
 const MAPPING_PORT = process.env.MAPPING_PORT ? process.env.MAPPING_PORT : 3000
 const ROSTER_PORT = process.env.ROSTER_PORT ? process.env.ROSTER_PORT : 3001
 const SURGE_PORT = process.env.SURGE_PORT ? process.env.SURGE_PORT : 3002
-const HOST = process.env.IS_DOCKER ? "192.168.99.100" : "localhost"
 
 var serverError = "500 Internal Server Error: Something has gone wrong on the server. Please try again in a little while."
 
@@ -24,7 +23,7 @@ app.post("/AlleysRider/", function(request, response) {
 
 
 function getBestDriverPrice(start, end, response) {
-	var mapUrl = "http://" + HOST + ":" + MAPPING_PORT 
+	var mapUrl = "http://mapping:" + MAPPING_PORT 
 		+ "/AlleysMapping/" + start + "/" + end
 	request(mapUrl,
 		function(error, mapResponse, body) {
@@ -36,7 +35,7 @@ function getBestDriverPrice(start, end, response) {
 
 
 function getCheapestKmRate(distances, response) {
-	var rosterUrl = "http://" + HOST + ":" + ROSTER_PORT 
+	var rosterUrl = "http://roster:" + ROSTER_PORT 
 		+ "/AlleysRoster"
 	request(rosterUrl,	
 		function(error, rosterResponse, body) {
@@ -51,7 +50,7 @@ function getSurgePrice(distances, driver, response) {
 	var distances = JSON.parse(distances)
 	var driver = JSON.parse(driver)
 	var surgeData = parseSurgeData(distances, driver)
-	var surgeUrl = "http://" + HOST + ":" + SURGE_PORT 
+	var surgeUrl = "http://surge:" + SURGE_PORT 
 		+ "/AlleysSurge/" + JSON.stringify(surgeData)
 	request(surgeUrl, 
 		function(error, surgeResponse, body) {
