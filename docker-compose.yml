@@ -4,7 +4,7 @@ services:
 
     mapping:
         build:
-            context: ./Dockerfiles/
+            context: ./Dockercomposefiles/
             dockerfile: MappingDockerFile
         command: node mapping.js
         ports:
@@ -18,7 +18,7 @@ services:
 
     roster:
         build:
-            context: ./Dockerfiles/
+            context: ./Dockercomposefiles/
             dockerfile: RosterDockerFile
         command: node roster.js
         ports:
@@ -43,7 +43,7 @@ services:
 
     surge:
         build:
-            context: ./Dockerfiles/
+            context: ./Dockercomposefiles/
             dockerfile: SurgeDockerFile
         command: node surgepricing.js
         ports:
@@ -57,7 +57,7 @@ services:
 
     rider:
         build:
-            context: ./Dockerfiles/
+            context: ./Dockercomposefiles/
             dockerfile: RiderDockerFile
         command: node rider.js
         ports:
@@ -68,7 +68,6 @@ services:
         volumes:
             - ./:/usr/src/rider
         depends_on:
-            - rostermongo
             - mapping
             - roster
             - surge
