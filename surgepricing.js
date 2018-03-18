@@ -13,8 +13,10 @@
 * Output: "Driver: Spok, Price: 3.00 Pound Sterling."
 */
 
-// The express object used to route API calls.
+
 const express = require( "express" )
+
+// app (obj): The express object used to route API calls.
 var app = express()
 
 // SURGE_PORT (number): The port the surge service listens on.
@@ -24,14 +26,14 @@ const SURGE_PORT = process.env.SURGE_PORT ? process.env.SURGE_PORT : 3002
 // is less than this limit the rate is doubled.
 const DRIVER_LIMIT = 5
 
-// The multiplier applied to the rate under different conditions.
+// MULTIPLIER (number): The multiplier applied to the rate under different conditions.
 const MULTIPLIER = 2
 
 
 /**
 * GET URL route to calculate the best driver and fare.
 *
-* @param  URL (string): machine_ip/AlleysSurge/parameters
+* @param  URL (string): machine_name/AlleysSurge/parameters
 * @param  function(request, response): Callback function to
 * respond to matching of the route.
 */
