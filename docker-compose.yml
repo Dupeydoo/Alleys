@@ -1,5 +1,5 @@
 version: "3"
-#implement logging.
+
 services:
 
     mapping:
@@ -36,8 +36,6 @@ services:
         image: mongo:latest
         ports:
             - "27017:27017"
-        #volumes:
-        #    - ./mongo_db/:/data/db
         networks:
             - alleys-net
 

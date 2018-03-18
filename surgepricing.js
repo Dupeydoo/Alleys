@@ -48,7 +48,7 @@ function writeErrorResponse(response, code, message) {
 
 
 function logError(code, message) {
-	console.error(new Date().toDateString() + " [HTTP Code: " + code + ", Message: " + message + "]")
+	console.error(new Date() + " [HTTP Code: " + code + ", Message: " + message + "]")
 }
 
 

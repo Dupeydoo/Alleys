@@ -5,7 +5,8 @@ var app = express()
 const MAPS_API_KEY = "AIzaSyAMmf0RuNmg3VO3GVFGL1SJaKz4m2QAuVI"
 const MAPPING_PORT = process.env.MAPPING_PORT ? process.env.MAPPING_PORT : 3000
 
-var serverError = "500 Internal Server Error: Something has gone wrong on the server. Please try again in a little while."
+var serverError = "500 Internal Server Error: Something has gone wrong on the server. " 
+	+ "Please try again in a little while."
 var notFound = "404 Not Found: The resource could not be found!"
 
 
@@ -83,7 +84,7 @@ function writeErrorResponse(response, code, message) {
 
 
 function logError(code, message) {
-	console.error(new Date().toDateString() + " [HTTP Code: " + code + ", Message: " + message + "]")
+	console.error(new Date() + " [HTTP Code: " + code + ", Message: " + message + "]")
 }
 
 

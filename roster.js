@@ -8,9 +8,11 @@ const MONGO_PROTOCOL = "mongodb://"
 const MONGO_SERVICE = MONGO_PROTOCOL + "rostermongo/AlleysDB"
 const MONGO_LOCAL = MONGO_PROTOCOL + "localhost/AlleysDB"
 
-var serverError = "500 Internal Server Error: Something has gone wrong on the server. Please try again in a little while."
+var serverError = "500 Internal Server Error: Something has gone wrong on the server." 
+	+ " Please try again in a little while."
 var notFound = "404 Not Found: The resource could not be found."
-var badRequest = "400 Bad Request: Did you provide a string name for the driver and a number for the rate"
+var badRequest = "400 Bad Request: Did you provide a string name for the driver and a" 
+	+ " number for the rate"
 
 var app = express()
 app.use(bodyParser.json())
@@ -43,6 +45,7 @@ app.get("/AlleysRoster", function(request, response) {
 		var min = collection.find().sort({rate: 1}).limit(1)
 
 		min.count(function(error, count) {
+			handleDatabaseError(error, response)
 			if(count > 0) {
 				min.forEach(function(minimum) {
 					
@@ -55,14 +58,14 @@ app.get("/AlleysRoster", function(request, response) {
 						}
 
 						else {
-							writeErrorResponse(response, 404, notFound)
+							response.status(204).send()
 						}
 					})
 				})
 			}
 
 			else {
-				writeErrorResponse(response, 404, notFound)
+				response.status(204).send()
 			}
 		})
 	})
@@ -82,7 +85,12 @@ app.put("/AlleysRoster/:name", function (request, response) {
 		collection.update({ name : name }, keyValue, {upsert : true},
 			function(error, result) {
 				handleDatabaseError(error, response)
-				response.status(200).json(keyValue)
+				var modified = result.result.nModified
+				if(modified) {
+					response.status(200).json(keyValue)
+				} else {
+					response.status(201).json(keyValue)
+				}
 				db.close()
 		})
 	})
@@ -93,21 +101,20 @@ app.delete("/AlleysRoster/:name", function(request, response) {
 	var name = request.params.name
 	
 	mongoClient.connect(MONGO_SERVICE,
-		function(error, db) {
-			handleDatabaseError(error, response)
-			var collection = getDatabaseCollection(db, response)
-			
-			collection.deleteOne({name : name},
-				function(error, result) {
-					handleDatabaseError(error, response)
-					if(result.deletedCount === 0) {
-						writeErrorResponse(response, 204, "204 No Content: " 
-							+ "The resource does not exist! Nothing deleted.")
-					} else {
-						response.status(200).json(name)
-					}
-					db.close()
-			})
+	function(error, db) {
+		handleDatabaseError(error, response)
+		var collection = getDatabaseCollection(db, response)
+		
+		collection.deleteOne({name : name},
+			function(error, result) {
+				handleDatabaseError(error, response)
+				if(result.deletedCount === 0) {
+					response.status(204).send()
+				} else {
+					response.status(200).json(name)
+				}
+				db.close()
+		})
 	})
 })
 
@@ -151,7 +158,7 @@ function writeErrorResponse(response, code, message) {
 
 
 function logError(code, message) {
-	console.error(new Date().toDateString() + " [HTTP Code: " + code + ", Message: " + message + "]")
+	console.error(new Date() + " [HTTP Code: " + code + ", Message: " + message + "]")
 }
 
 

@@ -9,3 +9,5 @@ curl -X POST -H "Content-Type: application/json" --data "{\"name\":\"MattGilbert
 curl -X GET localhost:3000/AlleysRoster/MattGilbert
 curl -X PUT -H "Content-Type: application/json" --data "{\"name\":\"MattGilbert\", \"rate\":\"600\"}" localhost:3000/AlleysRoster/MattGilbert
 curl -X DELETE localhost:3000/AlleysRoster/MattGilbert
+
+docker build -t roster -f ./Dockerfiles/RosterDockerFile ./Dockerfiles

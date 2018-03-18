@@ -7,15 +7,16 @@ const MAPPING_PORT = process.env.MAPPING_PORT ? process.env.MAPPING_PORT : 3000
 const ROSTER_PORT = process.env.ROSTER_PORT ? process.env.ROSTER_PORT : 3001
 const SURGE_PORT = process.env.SURGE_PORT ? process.env.SURGE_PORT : 3002
 
-var serverError = "500 Internal Server Error: Something has gone wrong on the server. Please try again in a little while."
+var serverError = "500 Internal Server Error: Something has gone wrong on the server. " + 
+	"Please try again in a little while."
 
 var app = express()
 app.use(bodyParser.json())
 
 
-app.post("/AlleysRider/", function(request, response) {
-	var start = request.body.start
-	var end = request.body.end
+app.get("/AlleysRider/:start/:end", function(request, response) {
+	var start = request.params.start
+	var end = request.params.end
 	if(validateStartEnd(response, start, end)) {
 		getBestDriverPrice(start, end, response)
 	}
@@ -83,8 +84,8 @@ function checkApiError(error, response, apiResponse) {
 		return false
 	}
 
-	else if(apiResponse.statusCode > 299) {
-		writeErrorResponse(response, apiResponse.statusCode, serverError)
+	else if(apiResponse.statusCode > 299 || apiResponse.statusCode === 204) {
+		writeErrorResponse(response, apiResponse.statusCode, apiResponse.body)
 		return false
 	}
 	return true
@@ -98,7 +99,7 @@ function writeErrorResponse(response, code, message) {
 
 
 function logError(code, message) {
-	console.error(new Date().toDateString() + " [HTTP Code: " + code + ", Message: " + message + "]")
+	console.error(new Date() + " [HTTP Code: " + code + ", Message: " + message + "]")
 }
 
 
