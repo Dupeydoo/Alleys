@@ -1,21 +1,53 @@
+/**
+* The roster microservice is an example of a storage as a service API. It 
+* communicates with the Alleys mongo database. It allows drivers to add
+* themselves to the roster, leave the roster and update their rate. A HTTP
+* GET method is also provided to allow another service to retrieve the
+* cheapest driver and rate, as well as the count of drivers in the roster.
+*
+* 
+* HTTP 1.1 Methods: POST, GET, PUT, DELETE
+* Author: 640010970
+*
+* Example curls:
+*
+* curl -X POST http://machine_name/AlleysRoster -H 'Content-Type: 
+* application/json' -d '{"name" : "Laura", "rate" : 102}'
+* 
+* curl -X GET http://machine_name/AlleysRoster
+*
+* curl -X PUT http://machine_name/AlleysRoster/Bertwick -H 
+* 'Content-Type: application/json' -d '{"name" : "Bertwick", "rate" : 20}'
+*
+* curl -X DELETE http://machine_name/AlleysRoster/Danny
+*/
+
 const mongo = require("mongodb")
 const mongoClient = mongo.MongoClient
 const express = require("express")
 const bodyParser = require("body-parser")
 
+// ROSTER_PORT (number): The port the roster service listens on.
 const ROSTER_PORT = process.env.ROSTER_PORT ? process.env.ROSTER_PORT : 3001
+
+// MONGO_PROTOCOL (string): The protocol mongo uses for connections.
 const MONGO_PROTOCOL = "mongodb://"
+
+// MONGO_SERVICE (string): The address used to connect to mongo.
 const MONGO_SERVICE = MONGO_PROTOCOL + "rostermongo/AlleysDB"
-const MONGO_LOCAL = MONGO_PROTOCOL + "localhost/AlleysDB"
 
-
+// serverError (string): The server error to display when something goes wrong.
 var serverError = "500 Internal Server Error: Something has gone wrong on the server." 
 	+ " Please try again in a little while."
+
+// notFound (string): The error to display when a resource could not be found.
 var notFound = "404 Not Found: The resource could not be found."
+
+// badRequest (string): The error to display when the requester provides incorrect input.
 var badRequest = "400 Bad Request: Did you provide a string name for the driver and a" 
 	+ " number for the rate"
 
-
+// app (obj): The express object used to route API calls.
 var app = express()
 app.use(bodyParser.json())
 
