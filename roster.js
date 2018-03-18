@@ -8,11 +8,13 @@ const MONGO_PROTOCOL = "mongodb://"
 const MONGO_SERVICE = MONGO_PROTOCOL + "rostermongo/AlleysDB"
 const MONGO_LOCAL = MONGO_PROTOCOL + "localhost/AlleysDB"
 
+
 var serverError = "500 Internal Server Error: Something has gone wrong on the server." 
 	+ " Please try again in a little while."
 var notFound = "404 Not Found: The resource could not be found."
 var badRequest = "400 Bad Request: Did you provide a string name for the driver and a" 
 	+ " number for the rate"
+
 
 var app = express()
 app.use(bodyParser.json())
@@ -75,7 +77,10 @@ app.get("/AlleysRoster", function(request, response) {
 app.put("/AlleysRoster/:name", function (request, response) {
 	var name = request.params.name
 	var keyValue = { name : request.body.name, rate : request.body.rate }
-	if(!validateInput("update", response, keyValue, name)) { return false }
+	
+	if(!validateInput("update", response, keyValue, name)) { 
+		return false 
+	}
 
 	mongoClient.connect(MONGO_SERVICE,
 	function(error, db) {
@@ -85,10 +90,13 @@ app.put("/AlleysRoster/:name", function (request, response) {
 		collection.update({ name : name }, keyValue, {upsert : true},
 			function(error, result) {
 				handleDatabaseError(error, response)
+				
 				var modified = result.result.nModified
 				if(modified) {
 					response.status(200).json(keyValue)
-				} else {
+				} 
+
+				else {
 					response.status(201).json(keyValue)
 				}
 				db.close()
@@ -108,9 +116,12 @@ app.delete("/AlleysRoster/:name", function(request, response) {
 		collection.deleteOne({name : name},
 			function(error, result) {
 				handleDatabaseError(error, response)
+				
 				if(result.deletedCount === 0) {
 					response.status(204).send()
-				} else {
+				} 
+
+				else {
 					response.status(200).json(name)
 				}
 				db.close()
