@@ -40,6 +40,12 @@ const MULTIPLIER = 2
 app.get( "/AlleysSurge/:surgeParameters", function(request, response) {
 	// Parse the parameters and convert metres to kilometres.
 	var parameters = JSON.parse(request.params.surgeParameters)
+
+	if(!validateSurgeInput(response, parameters.totalDistance, parameters.aDistance,
+		parameters.driver, parameters.rate, parameters.driverCount)) {
+		return false
+	}
+
 	var totalDistance = parameters.totalDistance / 1000
 	var aDistance = parameters.aDistance / 1000
 	var rate = parameters.rate
@@ -48,9 +54,13 @@ app.get( "/AlleysSurge/:surgeParameters", function(request, response) {
 	var normalPrice = (totalDistance - aDistance) * rate
 	var aPrice = MULTIPLIER * (aDistance * rate) 
 	var price = calculateFinalPrice(normalPrice, aPrice, parameters.driverCount)
+	var jsonResponse = {
+		"Driver" : parameters.driver, 
+		"Price" : formatPrice(price),
+		"Format" : "£"
+	}
 	
-	response.status(200).send("Driver: " + parameters.driver + ", " 
-		+ "Price: " + formatPrice(price) + " Pound Sterling.")
+	response.status(200).json(jsonResponse)
 })
 
 /**
@@ -89,6 +99,40 @@ function calculateFinalPrice(normalPrice, aPrice, driverCount) {
 }
 
 /**
+* Validates the input provided to the surge algorithm. Necessary if the service is
+* called without Rider to format a proper request.
+*
+* @param    response (obj): The response to write to the caller.
+* @param    totalDistance (number): The total distance of the journey.
+* @param    aDistance (number): The distance of the journey spent on A-roads.
+* @param    driver (string): The name of the cheapest driver.
+* @param    rate (number): The rate of the cheapest driver in pence/km.
+* @param    driverCount (number): The number of drivers in the roster.
+* @returns  (bool): False if validation fails, true otherwise.
+*/
+function validateSurgeInput(response, totalDistance, aDistance, driver, rate, driverCount) {
+	var badRequest = "400 Bad Request: Did you provide a total and A road " 
+		+ "distance number, a driver name, a driver rate and the number of" 
+		+ " drivers in the roster?"
+
+	// Check if any value is an empty string, or null etc. Driver count
+	// omitted, it could be zero.
+	if(!totalDistance || !aDistance || !driver || !rate) {
+		writeErrorResponse(response, 400, badRequest)
+		return false
+	}
+
+	// Check that we are receiving numbers for variables that will be
+	// subject to mathematical operations.
+	else if(!Number.isInteger(totalDistance) || !Number.isInteger(aDistance) 
+		|| !Number.isInteger(rate) || !Number.isInteger(driverCount)) {
+		writeErrorResponse(response, 400, badRequest)
+		return false
+	} 
+	return true
+}
+
+/**
 * Writes an error response with a code and message.
 *
 * @param  response (obj): The response to write information to.
@@ -96,7 +140,7 @@ function calculateFinalPrice(normalPrice, aPrice, driverCount) {
 * @param  message (string): The message to send the user.
 */
 function writeErrorResponse(response, code, message) {
-	response.status(code).send(message)
+	response.status(code).json({"Error Code" : code, "Message" : message})
 	logError(code, message)
 }
 
@@ -131,8 +175,8 @@ app.listen(SURGE_PORT, function() {
 * URI is provided.
 */
 app.use(function(request, response, next) {
-    writeErrorResponse(response, 404, "404: The resource could not be found!");
-});
+    writeErrorResponse(response, 404, "404: The resource could not be found!")
+})
 
 /**
 * A route to detect any unknown or unexpected server errors that cannot be

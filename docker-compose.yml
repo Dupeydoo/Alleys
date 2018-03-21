@@ -1,16 +1,24 @@
 version: "3"
 
+# Define the docker services. No replicas
+# are used in this particular application.
 services:
 
     mapping:
+        # Find the dockerfile.
         build:
             context: ./Dockercomposefiles/
             dockerfile: MappingDockerFile
+        # Run any commands required.
         command: node mapping.js
         ports:
             - "3000:3000"
+        # The environment variable used
+        # to dynamically set ports.
         environment:
             MAPPING_PORT: 3000
+        # The location to mount on the
+        # docker container.
         volumes:
             - ./:/usr/src/mapping
         networks:
@@ -71,7 +79,7 @@ services:
         networks:
             - alleys-net
 
-
+# Define the network.
 networks:
   alleys-net:
     driver: bridge

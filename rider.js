@@ -33,8 +33,8 @@ const ROSTER_PORT = process.env.ROSTER_PORT ? process.env.ROSTER_PORT : 3001
 const SURGE_PORT = process.env.SURGE_PORT ? process.env.SURGE_PORT : 3002
 
 // serverError (string): The server error to display when something goes wrong.
-var serverError = "500 Internal Server Error: Something has gone wrong on the server. " + 
-	"Please try again in a little while."
+var serverError = "500 Internal Server Error: Something has gone wrong on the " 
+	+ "server. Please try again in a little while."
 
 // app (obj): The express object used to route API calls.
 var app = express()
@@ -125,7 +125,13 @@ function getSurgePrice(distances, driver, response) {
 	request(surgeUrl, 
 		function(error, surgeResponse, body) {
 			if(checkApiError(error, response, surgeResponse)) {
-				response.status(200).send(body)
+				var body = JSON.parse(body)
+				var jsonResponse = {
+					"Driver" : body.Driver,
+					"Price" : body.Price,
+					"Format" : body.Format
+				}
+				response.status(200).json(jsonResponse)
 			}
 	})
 }
@@ -199,7 +205,7 @@ function checkApiError(error, response, apiResponse) {
 * @param  message (string): The message to send the user.
 */
 function writeErrorResponse(response, code, message) {
-	response.status(code).send(message)
+	response.status(code).json({"Error Code" : code, "Message" : message})
 	logError(code, message)
 }
 
@@ -233,8 +239,8 @@ app.listen(RIDER_PORT, function() {
 * URI is provided.
 */
 app.use(function(request, response, next) {
-    writeErrorResponse(response, 404, "404: The resource could not be found!");
-});
+    writeErrorResponse(response, 404, "404: The resource could not be found!")
+})
 
 /**
 * A route to detect any unknown or unexpected server errors that cannot be
